@@ -1,0 +1,286 @@
+create table Client_master
+(client_no varchar2(6) primary key check(client_no like 'C%'),
+name varchar2(20) not null,
+address1 varchar2(30),
+address2 varchar2(30),
+city varchar2(15),
+state varchar2(15),
+pincode number(6),
+bal_due number(10,2))
+/
+create table product_master
+(product_no varchar2(6) primary key check(product_no like 'P%'),
+description varchar2(50) not null,
+profit_percent number(3,2) not null,
+unit_measure varchar2(10) not null,
+qty_on_hand number(3) not null,
+record_lvl number(8) not null,
+sell_price number(8,2)not null check(sell_price not in 0),
+cost_price number(8,2)not null check(cost_price not in 0)
+)
+/
+create table salesman_master
+(salesman_no varchar2(6) primary key check(salesman_no like 'S%'),
+salesman_name varchar2(20) not null,
+Address1 varchar2(30) not null,
+Address2 varchar2(30),
+city varchar2(20) ,
+pincode varchar2(6),
+state varchar2(20),
+sal_amt number(8,2) not null check(sal_amt not in 0),
+tgt_to_get number(6,2) not null check(tgt_to_get not in 0),
+ytd_sales number(6,2) not null,
+remarks varchar2(60)
+)
+/
+create table sales_order
+(s_order_no varchar2(6) primary key check(s_order_no like 'O%'),
+s_order_date date,
+client_no varchar2(6) references client_master(client_no),
+dely_addr varchar2(25),
+salesman_no varchar2(6) references salesman_master(salesman_no),
+dely_type char(1) default 'F' check(dely_type in ('P','F')),
+billed_yn char(1) default 'N' check(billed_yn in ('Y','N')),
+dely_date date,
+order_status varchar(10) check(order_status in('In process','Fulfilled','BackOrder','Canceled')),
+constraint check_dely_date check(dely_date >=s_order_date)
+)
+/
+create table sales_order_details
+(
+s_order_no varchar2(6) references sales_order(s_order_no),
+product_no varchar2(6) references product_master(product_no),
+qty_ordered number(8),
+qty_disp number(8),
+product_rate number(10,2)                                                                                                        
+)
+/
+create table Challan_Header
+(
+challan_no varchar2(6) primary key check(challan_no like 'CH%'),
+s_order_no varchar2(6) references sales_order(s_order_no),
+challan_date date not null,
+billed_yn char(1) default 'N' check(billed_yn in ('Y','N'))                                                                                                       
+)
+/
+create table Challan_details
+(
+challan_no varchar2(6) references challan_header(challan_no),
+product_no varchar2(6) references product_master(product_no),
+qty_disp number(4,2)                                                                                                     
+)
+/
+
+
+
+
+=============================================================================================
+
+insert into client_master(client_no,name,city,state,pincode,bal_due) values('C00001','Ivan Bayross','Bombay','Maharashtra',400054,15000)
+/
+insert into client_master(client_no,name,city,state,pincode,bal_due) values('C00002','Vandana Saitwal','Madras','Tamil Nadu',400054,0)
+/
+insert into client_master(client_no,name,city,state,pincode,bal_due) values('C00003','Pramada Jaguste','Bombay','Maharashtra',400054,5000)
+/
+insert into client_master(client_no,name,city,state,pincode,bal_due) values('C00004','Basu Navindgi','Bombay','Maharashtra',400054,0)
+/
+insert into client_master(client_no,name,city,state,pincode,bal_due) values('C00005','Ravi Sreedharan','Delhi','Delhi',400054,2000)
+/
+insert into client_master(client_no,name,city,state,pincode,bal_due) values('C00006','Rukmini','Bombay','Maharashtra',400054,0)
+/
+
+
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P00001','1.44 Floppies',5,'Piece',100,20,525,500)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P03453','Monitors',6,'Piece',10,3,12000,11280)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P06734','Mouse
+',5,'Piece',20,5,1050,1000)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P07865','1.22 Floppies',5,'Piece',100,20,525,500)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P07868','Keyboards',2,'Piece',10,3,3150,3050)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P07885','CD Drive',2.5,'Piece',10,3,5250,5100)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P07965','540 HDD',4,'Piece',10,3,8400,8000)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P07975','1.44 Drive',5,'Piece',10,3,1050,1000)
+/
+insert into product_master(product_no,description,profit_percent,unit_measure,qty_on_hand,record_lvl,sell_price,cost_price)values('P08865','1.22 Drive',5,'Piece',2,3,1050,1000)
+/
+
+
+insert into salesman_master 
+(salesman_no,salesman_name,address1,address2,city,pincode,state,sal_amt,tgt_to_get,ytd_sales,remarks)values
+('S00001','Kiran','A/14','Worli','Bombay','400002','MAH',3000,100,50,'GOOD')
+/
+insert into salesman_master 
+(salesman_no,salesman_name,address1,address2,city,pincode,state,sal_amt,tgt_to_get,ytd_sales,remarks)values
+('S00002','Manish','65','Nariman','Bombay','400001','MAH',3000,200,100,'GOOD')
+/
+insert into salesman_master 
+(salesman_no,salesman_name,address1,address2,city,pincode,state,sal_amt,tgt_to_get,ytd_sales,remarks)values
+('S00003','Ravi','P-7','Bandra','Bombay','400032','MAH',3000,200,100,'GOOD')
+/
+insert into salesman_master 
+(salesman_no,salesman_name,address1,address2,city,pincode,state,sal_amt,tgt_to_get,ytd_sales,remarks)values
+('S00004','Ashish','A/5','Juhu','Bombay','400042','MAH',3500,200,150,'GOOD')
+/
+
+insert into sales_order 
+(s_order_no,s_order_date,client_no,dely_type,billed_yn,salesman_no,dely_date,order_status) values
+('O19001','12-jan-1996','C00001','F','N','S00001','20-jan-1996','In process')
+/
+insert into sales_order 
+(s_order_no,s_order_date,client_no,dely_type,billed_yn,salesman_no,dely_date,order_status) values
+('O19002','25-jan-1996','C00002','P','N','S00002','27-jan-1996','Canceled')
+/
+insert into sales_order 
+(s_order_no,s_order_date,client_no,dely_type,billed_yn,salesman_no,dely_date,order_status) values
+('O46865','18-feb-1996','C00003','F','Y','S00003','20-feb-1996','Fulfilled')
+/
+insert into sales_order 
+(s_order_no,s_order_date,client_no,dely_type,billed_yn,salesman_no,dely_date,order_status) values
+('O19003','03-apr-1996','C00001','F','Y','S00001','07-apr-1996','Fulfilled')
+/
+insert into sales_order 
+(s_order_no,s_order_date,client_no,dely_type,billed_yn,salesman_no,dely_date,order_status) values
+('O46866','20-may-1996','C00004','P','N','S00002','22-may-1996','Canceled')
+/
+insert into sales_order 
+(s_order_no,s_order_date,client_no,dely_type,billed_yn,salesman_no,dely_date,order_status) values
+('O10008','24-may-1996','C00005','F','N','S00004','26-may-1996','In process')
+/
+
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O19001','P00001',4,4,525)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O19001','P07965',2,1,8400)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O19001','P07885',2,1,5250)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O19002','P00001',10,0,525)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O46865','P07868',3,3,3150)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O46865','P07885',3,1,5250)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O46865','P00001',10,10,525)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O46865','P03453',4,4,1050)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O19003','P03453',2,2,1050)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O19003','P06734',1,1,1200)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O46866','P07965',1,0,8400)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O46866','P07975',1,0,1050)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O10008','P00001',10,5,525)
+/
+insert into sales_order_details (s_order_no,product_no,qty_ordered,qty_disp,product_rate)values('O10008','P07975',5,3,1050)
+/
+
+insert into Challan_Header(challan_no,s_order_no,challan_date,billed_yn)values('CH9001','O19001','12-dec-1995','Y')
+/
+insert into Challan_Header(challan_no,s_order_no,challan_date,billed_yn)values('CH6865','O46865','12-nov-1995','Y')
+/
+insert into Challan_Header(challan_no,s_order_no,challan_date,billed_yn)values('CH3965','O10008','12-oct-1995','Y')
+/
+
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH9001','P00001',4)
+/
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH9001','P07965',1)
+/
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH9001','P07885',1)
+/
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH6865','P07868',3)
+/
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH6865','P03453',4)
+/
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH6865','P00001',10)
+/
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH3965','P00001',5)
+/
+insert into Challan_details (challan_no,product_no,qty_disp)values('CH3965','P07975',2)
+/
+
+
+
+
+================================================================================================
+1.)Single table retrieval
+
+   1.select name from client_master;
+   2.select * from client_master;
+   3.select name,city from client_master;
+   4.select * from product_master;
+   5.select name from client_master where name like '_a%';
+   6.select name from client_master where city like '_a%';
+   7.select * from client_master where city in ('Bombay','Delhi','Madras');
+   8.select * from client_master where city in 'Bombay';
+   9.select * from client_master where bal_due>10000;
+  10.select * from sales_order where s_order_date like '%JAN%';
+  11.select * from sales_order where client_no in ('C00001','C00002');
+  12.select * from product_master where description in ('1.44 Drive','1.22 Drive');
+  13.select * from product_master where sell_price>2000 and sell_price<=5000;
+  14.select product_master.*,sell_price*15 from product_master where sell_price>1500 ;
+  15.select product_master.*,sell_price*15 as new_selling_price from product_master where sell_price>1500 ;
+  16.select * from product_master where cost_price<1500;
+  17.select * from product_master order by description;
+  18.select cost_price*cost_price from product_master;
+  19.select sell_price/cost_price-100 from product_master where description in '540 HDD';
+  20.select name,city,state from client_master where state not in 'Maharashtra';
+  21.select product_no,description,sell_price from product_master where description like 'M%';
+  22.select * from sales_order where order_status ='Canceled' and s_order_date like '%MAY%';
+
+2.)Set Functions and Concatenation :
+
+  23.select count(*) as Total_Order from sales_order;
+  24.select avg(cost_price) from product_master;
+  25.select min(cost_price) from product_master;
+  26.select max(cost_price) as max_price ,min(cost_price) as min_price from product_master;
+  27.select count(*) from product_master where cost_price>=1500;
+  28.select * from product_master where qty_on_hand<record_lvl;
+  29.select c.name ||' has placed order '||s.s_order_no||' on '||s.s_order_date from client_master c,sales_orders where c.client_no = s.client_no;
+
+3.)Having and Group by:
+
+  30.select description , sum(qty_ordered)from product_master p,sales_order_details sod where p.product_no=sod.product_no group by p.description;
+  31.select p.product_no,Description,sum(Qty_ordered*Product_rate)from product_master p,sales_order_details sod where p.product_no=sod.product_no group by description,p.product_no
+  32.select client_no , avg(qty_ordered),client_no from sales_order s ,sales_order_details s1 where s.s_order_no=s1.s_order_no and qty_ordered*product_rate>15000 group by client_no
+  33.select s.s_order_no,s.s_order_date,sum(so.qty_ordered*so.product_rate)"Order Billed",sum(so.qty_disp*so.product_rate) "Total Amount" from sales_orders, sales_order_details so where so.s_order_no=s.s_order_no and s.billed_yn='Y' and to_char(s_order_date,'mon')='jan' group by s.s_order_no,s.s_order_date;
+  34.select p.description||' Worth Rs'||sum(d.qty_disp*d.product_rate) from product_master p, sales_order_details d
+where p.product_no=d.product_no group by p.description; 
+  35.select p.description||' Worth Rs'||sum(d.qty_disp*d.product_rate)||' was ordered in the month of'||to_char(s_order_date,'month')"Description Total amount Month" from product_master p, sales_order_details d,sales_orders where p.product_no=d.product_no and s.s_order_no=d.s_order_no group by p.description,s.s_order_date;
+
+4.) Nested Queries :
+
+  36.select product_no ,description from product_master_2 where product_nonot in (select product_no from sales_order_details);
+  37.select name,city,pincode from client_master_2 where client_no in (selectclient_no from sales_order_2 where order_no = 'O1901' );
+  38.select client_no,name from client_master where client_no in(select client_no from sales_order 
+where to_char(s_order_date,'mon,yy')<'may,96');
+  39.select client_no,name from client_master where client_no in (select client_no from sales_order where s_order_no in (select s_order_no from sales_order_details where product_no in(select product_no from product_master where description='1.44 Drive')));
+  40.select name from client_master where client_no in(select client_no from sales_order where s_order_no in (select s_order_no from sales_order_details where (qty_ordered*product_rate)>=10000));
+
+5.) Queries using Date:
+
+  41.SELECT ORDER_NO, TO_CHAR(ORDERDATE,‘DAY’) “ORDER DAY” FROM SALES_ORDER;
+  42.SELECT ORDER_NO, TO_CHAR(DELIVDATE,‘MONTH’) “MONTH”, DELIVDATE FROM SALES_ORDER;
+  43.SELECT TO_CHAR(ORDERDATE,‘DD-MONTH-YY’) “ORDERDATE” FROM SALES_ORDER;
+  44.SELECT SYSDATE + 15 FROM DUAL;
+  45.select datediff(curdate(), Dely_Date) as days_diff from sales_order;
+
+6. ) Table Updations:
+
+  46.update sales_order set S_Order_Date = '24-JUL-1996' where Client_No = 'C00001';select * from sales_order where Client_No = 'C00001';
+  47.update product_master set Sell_Price = '1150.00' where Product_No = 'P07965';
+  48.delete from sales_order where S_Order_No = 'O19001';
+  49.delete from sales_order where Dely_Date < '10-July-96';
+  50.update client_master set City = 'Bombay' where Client_No='C00005';
+  51.update sales_order set Dely_Date = '16-AUG-1996' where S_Order_No = 'O10008';
+  52.update client_master set Bal_Due = 1000 where Client_No='C00001';
+  53.update product_master set Cost_Price = 950 where Product_No = 'P07865';
+
+
